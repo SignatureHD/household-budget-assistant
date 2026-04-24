@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FinWell Budget Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #1C1F26;
+    --lime: #B8D900;
+    --lime-dark: #9BBF00;
+    --white: #ffffff;
+    --off-white: #f7f6f2;
+    --grey: #9a9890;
+    --grey-dark: #5a5e6b;
+    --red: #e74c3c;
+    --blue: #2980b9;
+    --purple: #9b59b6;
+    --orange: #e67e22;
+    --green: #27ae60;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', sans-serif; background: var(--off-white); color: var(--dark); font-size: 14px; }
+
+  /* NAV */
+  nav { background: var(--dark); padding: 0 40px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-mark { width: 34px; height: 34px; background: var(--lime); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .nav-logo-text { font-family: 'League Spartan', sans-serif; font-size: 20px; font-weight: 900; color: white; letter-spacing: -0.03em; }
+  .nav-logo-text span { color: var(--lime); }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .nav-badge { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-back { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .15s; }
+  .nav-back:hover { color: var(--lime); }
+
+  /* HERO BAR */
+  .hero-bar { background: var(--dark); padding: 0 40px 28px; }
+  .hero-bar h1 { font-family: 'League Spartan', sans-serif; font-size: 32px; font-weight: 900; color: white; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .hero-bar p { font-size: 14px; color: rgba(255,255,255,0.5); }
+  .month-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .month-row label { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .month-select { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px 14px; font-size: 13px; color: white; cursor: pointer; font-family: 'Poppins', sans-serif; }
+  .month-select option { background: var(--dark); }
+
+  /* MAIN */
+  .main { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+  /* AI BANNER */
+  .ai-banner { background: var(--dark); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+  .ai-banner.populated { background: linear-gradient(135deg, #1a3a1a, #2d5a2d); }
+  .ai-icon { width: 38px; height: 38px; background: var(--lime); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ai-text { flex: 1; }
+  .ai-text strong { display: block; font-size: 13px; color: white; margin-bottom: 3px; }
+  .ai-text span { font-size: 12px; color: rgba(255,255,255,0.55); }
+  .ai-btn { background: var(--lime); border: none; border-radius: 8px; padding: 8px 18px; font-size: 12px; font-weight: 600; color: var(--dark); cursor: pointer; font-family: 'Poppins', sans-serif; white-space: nowrap; transition: all .15s; text-decoration: none; display: inline-block; }
+  .ai-btn:hover { background: var(--lime-dark); }
+
+  /* SUMMARY */
+  .summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+  .sum-card { background: white; border-radius: 12px; padding: 18px 20px; border: 1px solid rgba(28,31,38,0.06); }
+  .sum-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); margin-bottom: 8px; }
+  .sum-value { font-family: 'League Spartan', sans-serif; font-size: 26px; font-weight: 700; }
+  .sum-value.income { color: var(--lime-dark); }
+  .sum-value.expenses { color: var(--red); }
+  .sum-value.savings { color: var(--blue); }
+  .sum-value.remaining { color: var(--dark); }
+  .sum-value.negative { color: var(--red); }
+
+  /* BAR */
+  .bar-wrap { background: white; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid rgba(28,31,38,0.06); }
+  .bar { height: 10px; background: rgba(28,31,38,0.06); border-radius: 5px; overflow: hidden; display: flex; margin-bottom: 10px; }
+  .bar-exp { background: var(--red); transition: width .4s; }
+  .bar-sav { background: var(--blue); transition: width .4s; }
+  .bar-rem { background: var(--lime); transition: width .4s; }
+  .bar-legend { display: flex; gap: 20px; }
+  .bar-legend span { font-size: 12px; color: var(--grey-dark); display: flex; align-items: center; gap: 6px; }
+  .bar-legend .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* CATEGORIES */
+  .cat { background: white; border-radius: 14px; margin-bottom: 12px; overflow: hidden; border: 1px solid rgba(28,31,38,0.06); }
+  .cat-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; cursor: pointer; user-select: none; transition: background .15s; }
+  .cat-header:hover { background: rgba(28,31,38,0.02); }
+  .cat-title { display: flex; align-items: center; gap: 10px; font-family: 'League Spartan', sans-serif; font-size: 15px; font-weight: 700; color: var(--dark); }
+  .cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .cat-meta { display: flex; align-items: center; gap: 14px; }
+  .cat-total { font-size: 13px; color: var(--grey-dark); font-weight: 500; }
+  .cat-chev { font-size: 10px; color: var(--grey); transition: transform .2s; }
+  .cat-body { display: none; padding: 0 24px 16px; }
+  .cat-body.open { display: block; }
+  .row-hdr { display: grid; grid-template-columns: 1fr 130px 130px 90px 30px; gap: 8px; padding: 0 0 8px; border-bottom: 1px solid rgba(28,31,38,0.06); margin-bottom: 8px; }
+  .row-hdr span { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey); }
+  .row-hdr span:not(:first-child) { text-align: right; }
+  .brow { display: grid; grid-template-columns: 1fr 130px 130px 90px 30px; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .inp { background: rgba(28,31,38,0.04); border: 1px solid transparent; border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--dark); width: 100%; font-family: 'Poppins', sans-serif; transition: all .15s; }
+  .inp:focus { outline: none; background: white; border-color: var(--lime-dark); box-shadow: 0 0 0 3px rgba(184,217,0,0.1); }
+  .inp-r { background: rgba(28,31,38,0.04); border: 1px solid transparent; border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--dark); width: 100%; text-align: right; font-family: 'Poppins', sans-serif; transition: all .15s; }
+  .inp-r:focus { outline: none; background: white; border-color: var(--lime-dark); box-shadow: 0 0 0 3px rgba(184,217,0,0.1); }
+  .diff { font-size: 13px; font-weight: 600; text-align: right; }
+  .diff.ok { color: var(--green); }
+  .diff.over { color: var(--red); }
+  .del-btn { background: transparent; border: none; color: rgba(28,31,38,0.2); cursor: pointer; font-size: 18px; padding: 2px; transition: color .15s; line-height: 1; }
+  .del-btn:hover { color: var(--red); }
+  .add-btn { background: transparent; border: 1px dashed rgba(28,31,38,0.2); border-radius: 6px; padding: 7px 14px; font-size: 12px; color: var(--grey-dark); cursor: pointer; width: 100%; text-align: left; margin-top: 6px; font-family: 'Poppins', sans-serif; transition: all .15s; }
+  .add-btn:hover { background: rgba(184,217,0,0.08); border-color: var(--lime-dark); color: var(--lime-dark); }
+
+  /* FOOTER */
+  .footer-bar { background: white; border-radius: 14px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border: 1px solid rgba(28,31,38,0.06); }
+  .footer-info { font-size: 13px; color: var(--grey-dark); }
+  .footer-info strong { color: var(--dark); font-size: 15px; }
+  .dl-btn { background: var(--dark); color: var(--lime); border: none; border-radius: 10px; padding: 12px 24px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 8px; transition: all .15s; }
+  .dl-btn:hover { background: var(--lime); color: var(--dark); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .hero-bar { padding: 0 20px 24px; }
+    .hero-bar h1 { font-size: 24px; }
+    .main { padding: 20px 16px; }
+    .summary { grid-template-columns: repeat(2,1fr); gap: 8px; }
+    .sum-value { font-size: 20px; }
+    .row-hdr { grid-template-columns: 1fr 90px 90px 70px 24px; }
+    .brow { grid-template-columns: 1fr 90px 90px 70px 24px; }
+    .cat-header { padding: 14px 16px; }
+    .cat-body { padding: 0 16px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Password Gate -->
+<div id="budget-gate" style="display:flex;position:fixed;inset:0;background:var(--off-white);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:20px;padding:48px 40px;max-width:440px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(28,31,38,0.12);">
+    <div style="width:56px;height:56px;background:rgba(184,217,0,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#9BBF00" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    </div>
+    <h2 style="font-family:'League Spartan',sans-serif;font-size:26px;font-weight:900;color:var(--dark);margin-bottom:8px">Budget Tool Access</h2>
+    <p style="font-size:14px;color:var(--grey-dark);margin-bottom:28px;line-height:1.6">Enter your FinWell password to access the budget planner</p>
+    <input id="gate-pw" type="password" placeholder="Enter your password" 
+      style="width:100%;padding:12px 16px;border:1px solid rgba(28,31,38,0.15);border-radius:10px;font-size:14px;font-family:'Poppins',sans-serif;margin-bottom:12px;color:var(--dark);background:var(--off-white)"
+      onkeydown="if(event.key==='Enter')gateLogin()">
+    <div id="gate-err" style="color:#e74c3c;font-size:12px;margin-bottom:12px;min-height:16px"></div>
+    <button id="gate-btn" onclick="gateLogin()" 
+      style="width:100%;padding:13px;background:var(--dark);color:var(--lime);border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .15s">
+      Access Budget Tool
+    </button>
+    <div style="margin-top:20px">
+      <a href="index.html" style="font-size:13px;color:var(--grey-dark);text-decoration:none">← Back to FinWell</a>
+    </div>
+  </div>
+</div>
+
+<!-- Budget Content (hidden until authenticated) -->
+<div id="budget-content" style="display:none">
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1C1F26" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="nav-logo-text">Fin<span>Well</span></div>
+  </a>
+  <div class="nav-right">
+    <span class="nav-badge">Budget Planner</span>
+    <a class="nav-back" href="index.html#try">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to FinWell
+    </a>
+  </div>
+</nav>
+
+<div class="hero-bar">
+  <h1>Monthly Budget Planner</h1>
+  <p>Track income, expenses, debt and savings — auto-filled from your financial documents.</p>
+  <div class="month-row">
+    <label>Month:</label>
+    <select class="month-select" id="bmonth">
+      <option>January 2026</option><option>February 2026</option><option>March 2026</option>
+      <option>April 2026</option><option selected>May 2026</option><option>June 2026</option>
+      <option>July 2026</option><option>August 2026</option><option>September 2026</option>
+      <option>October 2026</option><option>November 2026</option><option>December 2026</option>
+    </select>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="ai-banner" id="ai-banner">
+    <div class="ai-icon">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1C1F26" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    </div>
+    <div class="ai-text">
+      <strong id="ai-title">AI Auto-Fill</strong>
+      <span id="ai-desc">Upload your bank statements and payslips in the FinWell AI chat — your budget will populate automatically with your real figures.</span>
+    </div>
+    <a class="ai-btn" href="index.html#try">Go to AI chat →</a>
+  </div>
+
+  <div class="summary">
+    <div class="sum-card"><div class="sum-label">Total income</div><div class="sum-value income" id="s-income">R0</div></div>
+    <div class="sum-card"><div class="sum-label">Total expenses</div><div class="sum-value expenses" id="s-expenses">R0</div></div>
+    <div class="sum-card"><div class="sum-label">Savings</div><div class="sum-value savings" id="s-savings">R0</div></div>
+    <div class="sum-card"><div class="sum-label">Remaining</div><div class="sum-value remaining" id="s-remaining">R0</div></div>
+  </div>
+
+  <div class="bar-wrap">
+    <div class="bar">
+      <div class="bar-exp" id="bar-exp" style="width:0%"></div>
+      <div class="bar-sav" id="bar-sav" style="width:0%"></div>
+      <div class="bar-rem" id="bar-rem" style="width:100%"></div>
+    </div>
+    <div class="bar-legend">
+      <span><div class="dot" style="background:var(--lime)"></div>Income remaining</span>
+      <span><div class="dot" style="background:var(--red)"></div>Expenses</span>
+      <span><div class="dot" style="background:var(--blue)"></div>Savings</span>
+    </div>
+  </div>
+
+  <!-- INCOME -->
+  <div class="cat">
+    <div class="cat-header" onclick="toggle('r-income',this)">
+      <div class="cat-title"><div class="cat-dot" style="background:var(--lime)"></div>Income</div>
+      <div class="cat-meta"><span class="cat-total" id="t-income">R0 budgeted</span><span class="cat-chev">▼</span></div>
+    </div>
+    <div class="cat-body open" id="r-income">
+      <div class="row-hdr"><span>Description</span><span>Budgeted</span><span>Actual</span><span>Diff</span><span></span></div>
+      <div id="rows-income"></div>
+      <button class="add-btn" onclick="addRow('income')">+ Add income source</button>
+    </div>
+  </div>
+
+  <!-- FIXED -->
+  <div class="cat">
+    <div class="cat-header" onclick="toggle('r-fixed',this)">
+      <div class="cat-title"><div class="cat-dot" style="background:var(--red)"></div>Fixed expenses</div>
+      <div class="cat-meta"><span class="cat-total" id="t-fixed">R0 budgeted</span><span class="cat-chev">▼</span></div>
+    </div>
+    <div class="cat-body" id="r-fixed">
+      <div class="row-hdr"><span>Description</span><span>Budgeted</span><span>Actual</span><span>Diff</span><span></span></div>
+      <div id="rows-fixed"></div>
+      <button class="add-btn" onclick="addRow('fixed')">+ Add fixed expense</button>
+    </div>
+  </div>
+
+  <!-- VARIABLE -->
+  <div class="cat">
+    <div class="cat-header" onclick="toggle('r-variable',this)">
+      <div class="cat-title"><div class="cat-dot" style="background:var(--orange)"></div>Variable expenses</div>
+      <div class="cat-meta"><span class="cat-total" id="t-variable">R0 budgeted</span><span class="cat-chev">▼</span></div>
+    </div>
+    <div class="cat-body" id="r-variable">
+      <div class="row-hdr"><span>Description</span><span>Budgeted</span><span>Actual</span><span>Diff</span><span></span></div>
+      <div id="rows-variable"></div>
+      <button class="add-btn" onclick="addRow('variable')">+ Add variable expense</button>
+    </div>
+  </div>
+
+  <!-- DEBT -->
+  <div class="cat">
+    <div class="cat-header" onclick="toggle('r-debt',this)">
+      <div class="cat-title"><div class="cat-dot" style="background:var(--purple)"></div>Debt repayments</div>
+      <div class="cat-meta"><span class="cat-total" id="t-debt">R0 budgeted</span><span class="cat-chev">▼</span></div>
+    </div>
+    <div class="cat-body" id="r-debt">
+      <div class="row-hdr"><span>Description</span><span>Budgeted</span><span>Actual</span><span>Diff</span><span></span></div>
+      <div id="rows-debt"></div>
+      <button class="add-btn" onclick="addRow('debt')">+ Add debt repayment</button>
+    </div>
+  </div>
+
+  <!-- SAVINGS -->
+  <div class="cat">
+    <div class="cat-header" onclick="toggle('r-savings',this)">
+      <div class="cat-title"><div class="cat-dot" style="background:var(--blue)"></div>Savings & investments</div>
+      <div class="cat-meta"><span class="cat-total" id="t-savings">R0 budgeted</span><span class="cat-chev">▼</span></div>
+    </div>
+    <div class="cat-body" id="r-savings">
+      <div class="row-hdr"><span>Description</span><span>Budgeted</span><span>Actual</span><span>Diff</span><span></span></div>
+      <div id="rows-savings"></div>
+      <button class="add-btn" onclick="addRow('savings')">+ Add saving/investment</button>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-info">Remaining after all expenses: <strong id="f-remaining">R0</strong></div>
+    <button class="dl-btn" onclick="dlBudget()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download budget PDF
+    </button>
+  </div>
+
+</div>
+
+<script>
+const bd = {
+  income:   [{desc:'Salary (net)',b:0,a:0},{desc:'Other income',b:0,a:0}],
+  fixed:    [{desc:'Bond / Rent',b:0,a:0},{desc:'Vehicle finance',b:0,a:0},{desc:'Insurance',b:0,a:0}],
+  variable: [{desc:'Groceries',b:0,a:0},{desc:'Fuel',b:0,a:0},{desc:'Utilities',b:0,a:0},{desc:'Eating out',b:0,a:0}],
+  debt:     [{desc:'Credit card',b:0,a:0},{desc:'Personal loan',b:0,a:0}],
+  savings:  [{desc:'Emergency fund',b:0,a:0},{desc:'TFSA / Investment',b:0,a:0}]
+};
+
+// ── SESSION CHECK ──
+async function checkSession() {
+  const pw = sessionStorage.getItem('finwell_session');
+  const time = parseInt(sessionStorage.getItem('finwell_session_time') || '0');
+  const age = Date.now() - time;
+  const maxAge = 8 * 60 * 60 * 1000; // 8 hours
+
+  // If no session or session too old, redirect to login
+  if (!pw || age > maxAge) {
+    showGate();
+    return false;
+  }
+
+  // Verify password is still valid with backend
+  try {
+    const res = await fetch('https://budget-assistant-backend-production.up.railway.app/api/auth', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: pw})
+    });
+    const data = await res.json();
+    if (!data.success) {
+      sessionStorage.removeItem('finwell_session');
+      showGate();
+      return false;
+    }
+    return true;
+  } catch(e) {
+    // If server unreachable but session exists, allow access
+    return true;
+  }
+}
+
+function showGate() {
+  document.getElementById('budget-gate').style.display = 'flex';
+  document.getElementById('budget-content').style.display = 'none';
+}
+
+async function gateLogin() {
+  const pw = document.getElementById('gate-pw').value.trim();
+  const btn = document.getElementById('gate-btn');
+  const err = document.getElementById('gate-err');
+  if (!pw) return;
+  btn.textContent = 'Checking...';
+  btn.disabled = true;
+  err.textContent = '';
+  try {
+    const res = await fetch('https://budget-assistant-backend-production.up.railway.app/api/auth', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: pw})
+    });
+    const data = await res.json();
+    if (data.success) {
+      sessionStorage.setItem('finwell_session', pw);
+      sessionStorage.setItem('finwell_session_time', Date.now().toString());
+      document.getElementById('budget-gate').style.display = 'none';
+      document.getElementById('budget-content').style.display = 'block';
+      loadFromStorage();
+      recalc();
+    } else {
+      err.textContent = 'Incorrect password. Please try again.';
+      btn.textContent = 'Access Budget Tool';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    err.textContent = 'Could not reach server. Please try again.';
+    btn.textContent = 'Access Budget Tool';
+    btn.disabled = false;
+  }
+}
+
+function fmt(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
+function parse(v){return parseFloat((v+'').replace(/[^0-9.-]/g,''))||0;}
+
+function toggle(id,hdr){
+  const b=document.getElementById(id);
+  const c=hdr.querySelector('.cat-chev');
+  const open=b.classList.contains('open');
+  b.classList.toggle('open',!open);
+  if(c) c.style.transform=open?'':'rotate(180deg)';
+}
+
+function addRow(key){
+  bd[key].push({desc:'',b:0,a:0});
+  recalc();
+  setTimeout(()=>{
+    const inputs=document.querySelectorAll('#rows-'+key+' .inp');
+    if(inputs.length) inputs[inputs.length-1].focus();
+  },50);
+}
+
+function delRow(key,i){bd[key].splice(i,1);recalc();}
+
+function renderSection(key){
+  const c=document.getElementById('rows-'+key);
+  const t=document.getElementById('t-'+key);
+  if(!c) return {b:0,a:0};
+  c.innerHTML='';
+  let tb=0,ta=0;
+  const isInc=key==='income';
+  bd[key].forEach((row,i)=>{
+    tb+=row.b; ta+=row.a;
+    const diff=isInc?(row.a-row.b):(row.b-row.a);
+    const over=diff<0;
+    const dt=diff===0?'—':(diff>0?'+':'')+fmt(diff);
+    const div=document.createElement('div');
+    div.className='brow';
+    div.innerHTML=`
+      <input class="inp" value="${row.desc||''}" placeholder="Description" onchange="bd['${key}'][${i}].desc=this.value">
+      <input class="inp-r" value="${row.b||''}" placeholder="R0"
+        onchange="bd['${key}'][${i}].b=parse(this.value);recalc()"
+        onfocus="if(this.value==='0')this.value=''"
+        onblur="if(!this.value){bd['${key}'][${i}].b=0;this.value=''}">
+      <input class="inp-r" value="${row.a||''}" placeholder="R0"
+        onchange="bd['${key}'][${i}].a=parse(this.value);recalc()"
+        onfocus="if(this.value==='0')this.value=''"
+        onblur="if(!this.value){bd['${key}'][${i}].a=0;this.value=''}">
+      <div class="diff ${over?'over':'ok'}">${dt}</div>
+      <button class="del-btn" onclick="delRow('${key}',${i})">×</button>
+    `;
+    c.appendChild(div);
+  });
+  if(t) t.textContent=fmt(tb)+' budgeted';
+  return {b:tb,a:ta};
+}
+
+function recalc(){
+  const inc =renderSection('income');
+  const fix =renderSection('fixed');
+  const vari=renderSection('variable');
+  const debt=renderSection('debt');
+  const sav =renderSection('savings');
+
+  const tInc =(inc.a ||inc.b);
+  const tExp =(fix.a ||fix.b)+(vari.a||vari.b)+(debt.a||debt.b);
+  const tSav =(sav.a ||sav.b);
+  const rem  =tInc-tExp-tSav;
+
+  document.getElementById('s-income').textContent   =fmt(tInc);
+  document.getElementById('s-expenses').textContent =fmt(tExp);
+  document.getElementById('s-savings').textContent  =fmt(tSav);
+  document.getElementById('s-remaining').textContent=fmt(rem);
+  document.getElementById('f-remaining').textContent=fmt(rem);
+
+  const remEl=document.getElementById('s-remaining');
+  remEl.className='sum-value remaining'+(rem<0?' negative':'');
+
+  const tot=tInc||1;
+  document.getElementById('bar-exp').style.width=Math.min(100,tExp/tot*100)+'%';
+  document.getElementById('bar-sav').style.width=Math.min(100,tSav/tot*100)+'%';
+  document.getElementById('bar-rem').style.width=Math.max(0,rem/tot*100)+'%';
+}
+
+// Load from sessionStorage if populated by AI
+function loadFromStorage(){
+  try {
+    const raw=sessionStorage.getItem('finwell_budget');
+    if(!raw) return;
+    const data=JSON.parse(raw);
+    bd.income=[];bd.fixed=[];bd.variable=[];bd.debt=[];bd.savings=[];
+    if(data.income)   Object.entries(data.income).forEach(([d,v])=>bd.income.push({desc:d,b:v,a:v}));
+    if(data.fixed)    Object.entries(data.fixed).forEach(([d,v])=>bd.fixed.push({desc:d,b:v,a:v}));
+    if(data.variable) Object.entries(data.variable).forEach(([d,v])=>bd.variable.push({desc:d,b:v,a:v}));
+    if(data.debt)     Object.entries(data.debt).forEach(([d,v])=>bd.debt.push({desc:d,b:v,a:v}));
+    if(data.savings)  Object.entries(data.savings).forEach(([d,v])=>bd.savings.push({desc:d,b:v,a:v}));
+    if(!bd.income.length)   bd.income=[{desc:'Salary (net)',b:0,a:0}];
+    if(!bd.fixed.length)    bd.fixed=[{desc:'Bond / Rent',b:0,a:0}];
+    if(!bd.variable.length) bd.variable=[{desc:'Groceries',b:0,a:0}];
+    // Open all sections
+    ['income','fixed','variable','debt','savings'].forEach(k=>{
+      const el=document.getElementById('r-'+k);
+      if(el) el.classList.add('open');
+    });
+    // Update banner
+    const banner=document.getElementById('ai-banner');
+    if(banner){
+      banner.classList.add('populated');
+      document.getElementById('ai-title').textContent='Budget auto-filled from your documents!';
+      document.getElementById('ai-desc').textContent='All figures below are from your uploaded bank statements and payslip. Review and adjust as needed.';
+      banner.querySelector('.ai-btn').textContent='Go back to AI chat';
+      banner.querySelector('.ai-btn').href='index.html#try';
+    }
+    sessionStorage.removeItem('finwell_budget');
+  } catch(e){ console.log('Budget load error:',e); }
+}
+
+function dlBudget(){
+  const month=document.getElementById('bmonth').value;
+  const date=new Date().toLocaleDateString('en-ZA',{year:'numeric',month:'long',day:'numeric'});
+  let rows='';
+  const sections=[
+    {key:'income',label:'Income',color:'#B8D900'},
+    {key:'fixed',label:'Fixed Expenses',color:'#e74c3c'},
+    {key:'variable',label:'Variable Expenses',color:'#e67e22'},
+    {key:'debt',label:'Debt Repayments',color:'#9b59b6'},
+    {key:'savings',label:'Savings & Investments',color:'#2980b9'},
+  ];
+  sections.forEach(s=>{
+    const items=bd[s.key];
+    const total=items.reduce((sum,r)=>sum+(r.a||r.b),0);
+    rows+=`<tr style="background:#f7f6f2"><td colspan="4" style="padding:10px 16px;font-weight:700;font-size:13px;border-left:4px solid ${s.color}">${s.label} — R${Math.round(total).toLocaleString('en-ZA')}</td></tr>`;
+    items.forEach(r=>{
+      const diff=s.key==='income'?(r.a-r.b):(r.b-r.a);
+      rows+=`<tr><td style="padding:8px 16px 8px 24px;font-size:13px">${r.desc||'—'}</td><td style="padding:8px 16px;text-align:right;font-size:13px">R${Math.round(r.b).toLocaleString('en-ZA')}</td><td style="padding:8px 16px;text-align:right;font-size:13px">R${Math.round(r.a).toLocaleString('en-ZA')}</td><td style="padding:8px 16px;text-align:right;font-size:13px;font-weight:600;color:${diff<0?'#e74c3c':'#27ae60'}">${diff===0?'—':(diff>0?'+':'')+'R'+Math.round(Math.abs(diff)).toLocaleString('en-ZA')}</td></tr>`;
+    });
+  });
+  const tInc=bd.income.reduce((s,r)=>s+(r.a||r.b),0);
+  const tExp=['fixed','variable','debt'].reduce((s,k)=>s+bd[k].reduce((ss,r)=>ss+(r.a||r.b),0),0);
+  const tSav=bd.savings.reduce((s,r)=>s+(r.a||r.b),0);
+  const rem=tInc-tExp-tSav;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FinWell Budget — ${month}</title>
+  <style>@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;900&family=Poppins:wght@300;400;500&display=swap');*{box-sizing:border-box;margin:0;padding:0}body{font-family:Poppins,Arial,sans-serif;color:#1C1F26}.hdr{background:#1C1F26;padding:24px 36px;display:flex;justify-content:space-between;align-items:center}.mark{width:38px;height:38px;background:#B8D900;border-radius:9px;display:flex;align-items:center;justify-content:center}.logo{display:flex;align-items:center;gap:12px}.name{font-family:'League Spartan',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.03em}.name span{color:#B8D900}.hdr-r{text-align:right}.hdr-title{color:#fff;font-size:13px;font-weight:500;margin-bottom:3px}.hdr-date{color:rgba(255,255,255,0.45);font-size:11px}.sum{display:flex;border-bottom:3px solid #B8D900;background:#f7f6f2}.si{flex:1;padding:16px 24px;border-right:1px solid #e2e0d8}.si:last-child{border:none}.sl{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#9a9890;margin-bottom:5px}.sv{font-family:'League Spartan',sans-serif;font-size:22px;font-weight:700}table{width:100%;border-collapse:collapse}.ct{padding:0 36px}td{border-bottom:1px solid #f0ede8;font-family:Poppins,sans-serif}.ftr{margin-top:40px;padding:16px 36px;background:#f7f6f2;border-top:1px solid #e2e0d8;font-size:10px;color:#9a9890;line-height:1.6}.pb{position:fixed;bottom:0;left:0;right:0;background:#1C1F26;padding:12px 36px;display:flex;justify-content:space-between;align-items:center}.pb p{color:rgba(255,255,255,0.6);font-size:12px}.pbtn{background:#B8D900;border:none;border-radius:6px;padding:8px 24px;font-weight:700;font-size:13px;cursor:pointer;color:#1C1F26;font-family:Poppins,sans-serif}@media print{.pb{display:none}}</style></head><body>
+  <div class="hdr"><div class="logo"><div class="mark"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1C1F26" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="name">Fin<span>Well</span></div></div><div class="hdr-r"><div class="hdr-title">Monthly Budget — ${month}</div><div class="hdr-date">${date}</div></div></div>
+  <div class="sum"><div class="si"><div class="sl">Income</div><div class="sv" style="color:#9BBF00">R${Math.round(tInc).toLocaleString('en-ZA')}</div></div><div class="si"><div class="sl">Expenses</div><div class="sv" style="color:#e74c3c">R${Math.round(tExp).toLocaleString('en-ZA')}</div></div><div class="si"><div class="sl">Savings</div><div class="sv" style="color:#2980b9">R${Math.round(tSav).toLocaleString('en-ZA')}</div></div><div class="si"><div class="sl">Remaining</div><div class="sv" style="color:${rem<0?'#e74c3c':'#27ae60'}">R${Math.round(rem).toLocaleString('en-ZA')}</div></div></div>
+  <div class="ct"><table><thead><tr style="background:#f7f6f2"><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#9a9890;font-weight:500">Description</th><th style="padding:10px 16px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#9a9890;font-weight:500">Budgeted</th><th style="padding:10px 16px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#9a9890;font-weight:500">Actual</th><th style="padding:10px 16px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#9a9890;font-weight:500">Diff</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="ftr"><strong>FinWell</strong> &middot; finwell.co.za &middot; A SignatureHD product &middot; ${date}<br>This budget is based on information provided. For comprehensive financial advice consult a registered CFP or contact FSCA at 0800 110 443.</div>
+  <div class="pb"><p>Click Save as PDF → select "Save as PDF" as destination</p><button class="pbtn" onclick="window.print()">Save as PDF</button></div>
+  </body></html>`);
+  win.document.close();
+}
+
+// Check session on load
+checkSession().then(valid => {
+  if (valid) {
+    document.getElementById('budget-gate').style.display = 'none';
+    document.getElementById('budget-content').style.display = 'block';
+    loadFromStorage();
+    recalc();
+  }
+});
+</script>
+</div>
+</body>
+</html>
