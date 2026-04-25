@@ -1648,6 +1648,118 @@
     .assessment-left h2 { font-size: 28px; }
     .assessment-searches { display: none; }
   }
+  /* ── LANGUAGE TOGGLE ── */
+  .lang-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .lang-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 6px 13px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .lang-toggle-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(184,217,0,0.35);
+    color: var(--lime);
+  }
+  .lang-toggle-btn svg {
+    width: 13px; height: 13px;
+    stroke: currentColor;
+    flex-shrink: 0;
+    transition: transform .2s;
+  }
+  .lang-toggle.open .lang-toggle-btn svg.chevron {
+    transform: rotate(180deg);
+  }
+
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #1e2129;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 180px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity .18s, transform .18s;
+    z-index: 200;
+  }
+  .lang-toggle.open .lang-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .lang-dropdown-header {
+    padding: 10px 16px 6px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    font-family: 'League Spartan', sans-serif;
+  }
+
+  .lang-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    color: rgba(255,255,255,0.65);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .lang-option:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--lime);
+  }
+  .lang-option.active {
+    color: var(--lime);
+    font-weight: 500;
+  }
+  .lang-option .lang-native {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+  }
+  .lang-option.active .lang-native {
+    color: rgba(184,217,0,0.5);
+  }
+  .lang-check {
+    width: 14px; height: 14px;
+    stroke: var(--lime);
+    opacity: 0;
+    flex-shrink: 0;
+  }
+  .lang-option.active .lang-check { opacity: 1; }
+
+  /* Mobile: hide lang toggle when nav-links hidden */
+  @media (max-width: 768px) {
+    .lang-toggle { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -1663,15 +1775,63 @@
     <span class="nav-logo-text">Fin<span>Well</span></span>
   </a>
   <ul class="nav-links">
-    <li><a href="#assessment">Free assessment</a></li>
-    <li><a href="#segments">Who we serve</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#how">How it works</a></li>
-    <li><a href="budget.html" target="finwell_budget" id="nav-budget-link">Budget tool</a></li>
-    <li><a href="/learn.html" target="_blank">Learn</a></li>
-    <li><a href="#try">Try it</a></li>
+    <li><a href="#assessment" data-i18n="nav.assessment">Free assessment</a></li>
+    <li><a href="#segments" data-i18n="nav.serve">Who we serve</a></li>
+    <li><a href="#features" data-i18n="nav.features">Features</a></li>
+    <li><a href="#how" data-i18n="nav.how">How it works</a></li>
+    <li><a href="budget.html" target="finwell_budget" id="nav-budget-link" data-i18n="nav.budget">Budget tool</a></li>
+    <li><a href="/learn.html" target="_blank" data-i18n="nav.learn">Learn</a></li>
+    <li><a href="#try" data-i18n="nav.try">Try it</a></li>
   </ul>
-  <a href="#assessment" class="nav-cta">Free assessment</a>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <!-- Language Toggle -->
+    <div class="lang-toggle" id="langToggle">
+      <button class="lang-toggle-btn" onclick="toggleLangDropdown(event)" aria-label="Select language">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>
+        </svg>
+        <span id="langLabel">English</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-dropdown-header">Select language</div>
+        <button class="lang-option active" data-lang="en" onclick="setLanguage('en')">
+          <span>English</span>
+          <span class="lang-native">English</span>
+          <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="lang-option" data-lang="zu" onclick="setLanguage('zu')">
+          <span>isiZulu</span>
+          <span class="lang-native">Zulu</span>
+          <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="lang-option" data-lang="xh" onclick="setLanguage('xh')">
+          <span>isiXhosa</span>
+          <span class="lang-native">Xhosa</span>
+          <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="lang-option" data-lang="af" onclick="setLanguage('af')">
+          <span>Afrikaans</span>
+          <span class="lang-native">Afrikaans</span>
+          <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="lang-option" data-lang="st" onclick="setLanguage('st')">
+          <span>Sesotho</span>
+          <span class="lang-native">Sotho</span>
+          <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="lang-option" data-lang="tn" onclick="setLanguage('tn')">
+          <span>Setswana</span>
+          <span class="lang-native">Tswana</span>
+          <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <a href="#assessment" class="nav-cta" data-i18n="nav.cta">Free assessment</a>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -3197,6 +3357,7 @@ function btAddRow(key) {
 
 function btDeleteRow(key, i) {
   btData[key].splice(i, 1);
+  
   btRecalc();
 }
 
@@ -3236,7 +3397,6 @@ function btRenderSection(key) {
   if (totalEl) totalEl.textContent = btFmt(budgeted) + ' budgeted';
   return {budgeted, actual};
 }
-
 function btRecalc() {
   const inc  = btRenderSection('income');
   const fix  = btRenderSection('fixed');
@@ -3589,7 +3749,538 @@ function btDownload() {
   </body></html>`);
   win.document.close();
 }
+// ── TRANSLATIONS ──
+const i18n = {
+  en: {
+    // Nav
+    'nav.assessment': 'Free assessment',
+    'nav.serve':      'Who we serve',
+    'nav.features':   'Features',
+    'nav.how':        'How it works',
+    'nav.budget':     'Budget tool',
+    'nav.learn':      'Learn',
+    'nav.try':        'Try it',
+    'nav.cta':        'Free assessment',
 
+    // Hero
+    'hero.tag':       'AI-powered financial wellness',
+    'hero.h1':        'Financial wellness<br/>for <em>every</em><br/>South African',
+    'hero.sub':       'FinWell gives individuals, employers, debt counsellors, and financial advisors a powerful AI tool that reads real financial documents and delivers personalised, actionable advice.',
+    'hero.cta1':      'Try FinWell free',
+    'hero.cta2':      'Who we serve',
+
+    // Assessment
+    'assess.tag':     'Free · No sign-up · 30 seconds',
+    'assess.h2':      'Not sure where<br>to start?',
+    'assess.h2.lime': 'Start here.',
+    'assess.sub':     'Before you miss another payment — get a clear picture of where you stand and exactly what to do next. No jargon. No judgement.',
+    'assess.card.h':  'Your money action plan',
+    'assess.card.sub':'Free · Takes 30 seconds',
+    'assess.s1.title':'Monthly take-home pay?',
+    'assess.s1.sub':  'After tax — the amount that lands in your account.',
+    'assess.s1.hint': 'Include all income sources — salary, freelance, rental',
+    'assess.s2.title':'Monthly expenses?',
+    'assess.s2.sub':  'Groceries, fuel, school, subscriptions — everything except debt repayments.',
+    'assess.s2.hint': 'Your best estimate is fine',
+    'assess.s3.title':'Monthly debt repayments?',
+    'assess.s3.sub':  'Bond, car, credit cards, personal loans, store accounts — all instalments combined.',
+    'assess.s3.hint': 'Enter 0 if you have no debt repayments',
+    'assess.btn.next':'Next →',
+    'assess.btn.back':'← Back',
+    'assess.btn.get': 'Get my action plan →',
+    'assess.btn.restart':'Start over',
+
+    // Chat
+    'chat.title':     'FinWell Assistant',
+    'chat.subtitle':  'Personalised financial wellness guidance',
+    'chat.online':    'Online',
+    'chat.placeholder':'Type your message...',
+    'chat.privacy':   'Documents are sent directly to the AI for analysis and are never stored on any server.',
+    'chat.docs.label':'Documents',
+    'chat.docs.none': 'No documents — upload below or drag & drop',
+    'chat.docs.add':  '+ Add document',
+    'chat.drop':      'Drop your documents here',
+
+    // Who we serve
+    'seg.label':      'Who we serve',
+    'seg.h2':         'Built for every corner of financial wellness',
+
+    // CTA section
+    'cta.label':      'Get started today',
+    'cta.h2':         'Financial wellness that works for everyone',
+    'cta.sub':        'Need a personal financial plan? Start today. Want to offer your clients a powerful financial wellness tool? FinWell is ready to work for you.',
+    'cta.btn':        'Try FinWell free',
+
+    // Footer
+    'footer.product': 'Product',
+    'footer.contact': 'Contact',
+  },
+
+  zu: {
+    'nav.assessment': 'Hlola mahhala',
+    'nav.serve':      'Esisebenzela bona',
+    'nav.features':   'Izici',
+    'nav.how':        'Ukusebenza',
+    'nav.budget':     'Isikweletu',
+    'nav.learn':      'Funda',
+    'nav.try':        'Zama',
+    'nav.cta':        'Hlola mahhala',
+
+    'hero.tag':       'Ezezimali ngobuchule be-AI',
+    'hero.h1':        'Impilo yezimali<br/>yawo <em>wonke</em><br/>umuntu waseNingizimu Afrika',
+    'hero.sub':       'I-FinWell inika abantu siqu, abaqashi, abeluleki bezikweletu kanye nezinhlangano zamasentheni ithuba lokusebenzisa ithuluzi le-AI elinamandla.',
+    'hero.cta1':      'Zama i-FinWell mahhala',
+    'hero.cta2':      'Esisebenzela bona',
+
+    'assess.tag':     'Mahhala · Awudingeki ukubhalisa · Amasekhondi angu-30',
+    'assess.h2':      'Awazi ukuqala<br>kuphi?',
+    'assess.h2.lime': 'Qala lapha.',
+    'assess.sub':     'Ngaphambi kokushaya inhlawulo — thola isithombe esicacile sokuthi uphina futhi okulandelayo okufanele ukwenze.',
+    'assess.card.h':  'Uhlelo lwakho lwemali',
+    'assess.card.sub':'Mahhala · Amaminiti angu-30',
+    'assess.s1.title':'Umholo wenyanga ngemva kwentela?',
+    'assess.s1.sub':  'Ngemva kwentela — imali efika esikhwameni sakho.',
+    'assess.s1.hint': 'Faka imithombo yonke yemali',
+    'assess.s2.title':'Izindleko zenyanga?',
+    'assess.s2.sub':  'Ukudla, uphethiloli, isikole, izinkontraki — konke ngaphandle kwezikweletu.',
+    'assess.s2.hint': 'Isilinganiso sakho esihle siyamukeleka',
+    'assess.s3.title':'Izikweletu zenyanga?',
+    'assess.s3.sub':  'Ibhondi, imoto, amakhadi esikweletu, izikweletu — konke.',
+    'assess.s3.hint': 'Faka u-0 uma ungenazikweletu',
+    'assess.btn.next':'Okulandelayo →',
+    'assess.btn.back':'← Emuva',
+    'assess.btn.get': 'Thola uhlelo lwami lwemali →',
+    'assess.btn.restart':'Qala phansi',
+
+    'chat.title':     'Umsizi we-FinWell',
+    'chat.subtitle':  'Iseluleko sezimali esikhethekile',
+    'chat.online':    'Ukhona',
+    'chat.placeholder':'Bhala umlayezo wakho...',
+    'chat.privacy':   'Imibhalo ithunyelwa ngqo ku-AI futhi ayigcinwa kunoma iyiphi iseva.',
+    'chat.docs.label':'Imibhalo',
+    'chat.docs.none': 'Ayikho imibhalo — layisha ngezansi noma hudulela lapha',
+    'chat.docs.add':  '+ Engeza umqulu',
+    'chat.drop':      'Donsela imibhalo yakho lapha',
+
+    'seg.label':      'Esisebenzela bona',
+    'seg.h2':         'Yakhiwe ngawo wonke amazinga empilo yezimali',
+
+    'cta.label':      'Qala namuhla',
+    'cta.h2':         'Impilo yezimali esebenza kuwo wonke umuntu',
+    'cta.sub':        'Udinga uhlelo lwezimali lomuntu siqu? Qala namuhla.',
+    'cta.btn':        'Zama i-FinWell mahhala',
+
+    'footer.product': 'Imikhiqizo',
+    'footer.contact': 'Xhumana',
+  },
+
+  xh: {
+    'nav.assessment': 'Uviwo mahhala',
+    'nav.serve':      'Esibakhonzayo',
+    'nav.features':   'Iimpawu',
+    'nav.how':        'Ukusebenza',
+    'nav.budget':     'Isixhobo soqoqosho',
+    'nav.learn':      'Funda',
+    'nav.try':        'Zama',
+    'nav.cta':        'Uviwo mahhala',
+
+    'hero.tag':       'Impilo yezimali nge-AI',
+    'hero.h1':        'Impilo yezimali<br/>ye<em>wonke</em><br/>umSouth African',
+    'hero.sub':       'I-FinWell inika abantu, abaqeshi, ababoneleli bamatyala kunye nabacebisi bezimali isixhobo esinamandla se-AI.',
+    'hero.cta1':      'Zama i-FinWell mahhala',
+    'hero.cta2':      'Esibakhonzayo',
+
+    'assess.tag':     'Mahhala · Akufuneki ukubhalisa · Imizuzwana engama-30',
+    'assess.h2':      'Awazi ukuqala<br>phi?',
+    'assess.h2.lime': 'Qala apha.',
+    'assess.sub':     'Ngaphambi kokutshiwa intshayelelo — fumana umfanekiso ocacileyo wendawo oyiyo.',
+    'assess.card.h':  'Icebo lakho lemali',
+    'assess.card.sub':'Mahhala · Ithatha imizuzwana engama-30',
+    'assess.s1.title':'Umvuzo wenyanga emva kwentela?',
+    'assess.s1.sub':  'Emva kwentela — imali efika kwiakhawunti yakho.',
+    'assess.s1.hint': 'Faka yonke imithombo yemali',
+    'assess.s2.title':'Iindleko zenyanga?',
+    'assess.s2.sub':  'Ukutya, ipetrol, isikolo, iisabskripshoni — yonke into ngaphandle kwamatyala.',
+    'assess.s2.hint': 'Isilinganiso sakho silungile',
+    'assess.s3.title':'Iintlawulo zamatyala zenyanga?',
+    'assess.s3.sub':  'Ibhondi, imoto, ikhadi letyala, iimali ezibolekiweyo — yonke.',
+    'assess.s3.hint': 'Faka u-0 ukuba awunatyala',
+    'assess.btn.next':'Okulandelayo →',
+    'assess.btn.back':'← Emva',
+    'assess.btn.get': 'Fumana icebo lam lemali →',
+    'assess.btn.restart':'Qala ngokutsha',
+
+    'chat.title':     'Umncedi we-FinWell',
+    'chat.subtitle':  'Iingcebiso zezimali ezikhethekileyo',
+    'chat.online':    'Ukhona',
+    'chat.placeholder':'Bhala umyalezo wakho...',
+    'chat.privacy':   'Imiqulu ithunyelwa ngqo kwi-AI kwaye ayigcinwa nakwiseva nayiphi na.',
+    'chat.docs.label':'Imiqulu',
+    'chat.docs.none': 'Akukho miqulu — layisha ngezantsi okanye tsalela apha',
+    'chat.docs.add':  '+ Yongeza isiqulathi',
+    'chat.drop':      'Tsalela imiqulu yakho apha',
+
+    'seg.label':      'Esibakhonzayo',
+    'seg.h2':         'Yakhiwe yonke imikhakha yempilo yezimali',
+
+    'cta.label':      'Qala namhla',
+    'cta.h2':         'Impilo yezimali esebenzayo kubo bonke',
+    'cta.sub':        'Ufuna icebo lezimali lomntu ngamnye? Qala namhla.',
+    'cta.btn':        'Zama i-FinWell mahhala',
+
+    'footer.product': 'Imveliso',
+    'footer.contact': 'Qhagamshelana',
+  },
+
+  af: {
+    'nav.assessment': 'Gratis assessering',
+    'nav.serve':      'Wie ons bedien',
+    'nav.features':   'Kenmerke',
+    'nav.how':        'Hoe dit werk',
+    'nav.budget':     'Begrotingshulpmiddel',
+    'nav.learn':      'Leer',
+    'nav.try':        'Probeer',
+    'nav.cta':        'Gratis assessering',
+
+    'hero.tag':       'KI-aangedrewe finansiële welstand',
+    'hero.h1':        'Finansiële welstand<br/>vir <em>elke</em><br/>Suid-Afrikaner',
+    'hero.sub':       'FinWell gee individue, werkgewers, skuldberaders en finansiële adviseurs \'n kragtige KI-hulpmiddel wat werklike finansiële dokumente lees.',
+    'hero.cta1':      'Probeer FinWell gratis',
+    'hero.cta2':      'Wie ons bedien',
+
+    'assess.tag':     'Gratis · Geen registrasie · 30 sekondes',
+    'assess.h2':      'Onseker waar<br>om te begin?',
+    'assess.h2.lime': 'Begin hier.',
+    'assess.sub':     'Voordat jy \'n betaling misloop — kry \'n duidelike prentjie van waar jy staan en presies wat jy volgende moet doen.',
+    'assess.card.h':  'Jou geldaksieplan',
+    'assess.card.sub':'Gratis · Neem 30 sekondes',
+    'assess.s1.title':'Maandelikse netto salaris?',
+    'assess.s1.sub':  'Na belasting — die bedrag wat in jou rekening land.',
+    'assess.s1.hint': 'Sluit alle inkomstebronne in',
+    'assess.s2.title':'Maandelikse uitgawes?',
+    'assess.s2.sub':  'Kruideniersware, brandstof, skool, intekeninge — alles behalwe skuldbetalings.',
+    'assess.s2.hint': 'Jou beste skatting is goed',
+    'assess.s3.title':'Maandelikse skuldbetalings?',
+    'assess.s3.sub':  'Band, motor, kredietkaarte, persoonlike lenings, winkelrekeninge — alles saam.',
+    'assess.s3.hint': 'Voer 0 in as jy geen skuld het nie',
+    'assess.btn.next':'Volgende →',
+    'assess.btn.back':'← Terug',
+    'assess.btn.get': 'Kry my aksieplan →',
+    'assess.btn.restart':'Begin oor',
+
+    'chat.title':     'FinWell Assistent',
+    'chat.subtitle':  'Persoonlike finansiële welstandleiding',
+    'chat.online':    'Aanlyn',
+    'chat.placeholder':'Tik jou boodskap...',
+    'chat.privacy':   'Dokumente word direk na die KI gestuur en word nooit op enige bediener gestoor nie.',
+    'chat.docs.label':'Dokumente',
+    'chat.docs.none': 'Geen dokumente — laai hieronder op of sleep en los',
+    'chat.docs.add':  '+ Voeg dokument by',
+    'chat.drop':      'Los jou dokumente hier',
+
+    'seg.label':      'Wie ons bedien',
+    'seg.h2':         'Gebou vir elke hoek van finansiële welstand',
+
+    'cta.label':      'Begin vandag',
+    'cta.h2':         'Finansiële welstand wat vir almal werk',
+    'cta.sub':        'Het jy \'n persoonlike finansiële plan nodig? Begin vandag.',
+    'cta.btn':        'Probeer FinWell gratis',
+
+    'footer.product': 'Produk',
+    'footer.contact': 'Kontak',
+  },
+
+  st: {
+    'nav.assessment': 'Tekolo ya mahala',
+    'nav.serve':      'Bao re ba sebetsang',
+    'nav.features':   'Dikarolo',
+    'nav.how':        'Ho sebetsa joang',
+    'nav.budget':     'Sesebeliswa sa tekanyetso',
+    'nav.learn':      'Ithuta',
+    'nav.try':        'Leka',
+    'nav.cta':        'Tekolo ya mahala',
+
+    'hero.tag':       'Bophelo ba lichelete ka AI',
+    'hero.h1':        'Bophelo ba lichelete<br/>ba <em>Mosotho</em><br/>e mong le e mong',
+    'hero.sub':       'FinWell e fa batho, bahlahisi, balekane ba likoloto le baeleli ba lichelete setsebi sa AI se matla.',
+    'hero.cta1':      'Leka FinWell mahala',
+    'hero.cta2':      'Bao re ba sebetsang',
+
+    'assess.tag':     'Mahala · Ha ho hlokahale ho ngodisa · Metsotsoana e 30',
+    'assess.h2':      'Ha o tsebe ho<br>qala kae?',
+    'assess.h2.lime': 'Qala mona.',
+    'assess.sub':     'Pele o hloka ho lefa — fumana setshwantsho se hlakile sa moo o leng teng.',
+    'assess.card.h':  'Leano la hao la chelete',
+    'assess.card.sub':'Mahala · E nka metsotsoana e 30',
+    'assess.s1.title':'Moputso wa kgwedi ka mor\'a lekgetho?',
+    'assess.s1.sub':  'Ka mor\'a lekgetho — chelete e fihlelang akhaonteng ya hao.',
+    'assess.s1.hint': 'Kenyelletsa mehloli yohle ya chelete',
+    'assess.s2.title':'Ditšenyehelo tsa kgwedi?',
+    'assess.s2.sub':  'Dijo, petrole, sekolo, di-subscription — tsohle ntle le likoloto.',
+    'assess.s2.hint': 'Khakanyo ya hao e lokile',
+    'assess.s3.title':'Ditefiso tsa likoloto tsa kgwedi?',
+    'assess.s3.sub':  'Bond, koloi, dikhadi tsa mokitlane, likoloto — tsohle hammoho.',
+    'assess.s3.hint': 'Kenya 0 ha o se na likoloto',
+    'assess.btn.next':'E hlahlamang →',
+    'assess.btn.back':'← Morao',
+    'assess.btn.get': 'Fumana leano la ka →',
+    'assess.btn.restart':'Qala hape',
+
+    'chat.title':     'Motlatsi wa FinWell',
+    'chat.subtitle':  'Tataiso e ikhethileng ya lichelete',
+    'chat.online':    'O teng',
+    'chat.placeholder':'Ngola molaetsa wa hao...',
+    'chat.privacy':   'Ditokomane di romellwa ka kotloloho ho AI mme ha di bolokwe ho seva epe.',
+    'chat.docs.label':'Ditokomane',
+    'chat.docs.none': 'Ha ho na ditokomane — kenya ka tlase kapa kgetha le ho tshela',
+    'chat.docs.add':  '+ Kenyelletsa tokomane',
+    'chat.drop':      'Lahla ditokomane tsa hao mona',
+
+    'seg.label':      'Bao re ba sebetsang',
+    'seg.h2':         'E hahilwe bakeng sa mekha yohle ya bophelo ba lichelete',
+
+    'cta.label':      'Qala kajeno',
+    'cta.h2':         'Bophelo ba lichelete bo sebetsang ho bohle',
+    'cta.sub':        'O hloka leano la lichelete la motho ka mong? Qala kajeno.',
+    'cta.btn':        'Leka FinWell mahala',
+
+    'footer.product': 'Sehlahiswa',
+    'footer.contact': 'Ikopanye',
+  },
+
+  tn: {
+    'nav.assessment': 'Tlhatlhoso ya mahala',
+    'nav.serve':      'Bao re ba direlelang',
+    'nav.features':   'Didiriswa',
+    'nav.how':        'Go dira jang',
+    'nav.budget':     'Sediriswa sa bajete',
+    'nav.learn':      'Ithuta',
+    'nav.try':        'Leka',
+    'nav.cta':        'Tlhatlhoso ya mahala',
+
+    'hero.tag':       'Boitekanelo jwa madi ka AI',
+    'hero.h1':        'Boitekanelo jwa madi<br/>jwa <em>mongwe</em><br/>le mongwe wa Aforika Borwa',
+    'hero.sub':       'FinWell e naya batho, baempoloi, bakaedi ba dikoloto le baelebedi ba madi sediriswa sa AI se se nonofileng.',
+    'hero.cta1':      'Leka FinWell mahala',
+    'hero.cta2':      'Bao re ba direlelang',
+
+    'assess.tag':     'Mahala · Go se batlege go ingodisa · Metsotso e 30',
+    'assess.h2':      'Ga o itse go<br>simolola kae?',
+    'assess.h2.lime': 'Simolola fa.',
+    'assess.sub':     'Pele ga o tlhaela go duela — bona seswantsho se se gapeletsegileng sa moo o leng teng.',
+    'assess.card.h':  'Lenaane la gago la madi',
+    'assess.card.sub':'Mahala · E tsaya metsotso e 30',
+    'assess.s1.title':'Moputso wa kgwedi morago ga lekgetho?',
+    'assess.s1.sub':  'Morago ga lekgetho — madi a fitlhelang akhaonteng ya gago.',
+    'assess.s1.hint': 'Akaretsa mesetso yotlhe ya madi',
+    'assess.s2.title':'Ditshenyegelo tsa kgwedi?',
+    'assess.s2.sub':  'Dijo, petrol, sekolo, di-subscription — tsotlhe ntle le dikoloto.',
+    'assess.s2.hint': 'Tekanyetso ya gago e siame',
+    'assess.s3.title':'Ditefo tsa dikoloto tsa kgwedi?',
+    'assess.s3.sub':  'Bond, koloi, dikhadi tsa mokitlane, dikoloto — tsotlhe mmogo.',
+    'assess.s3.hint': 'Tsenya 0 fa o se na dikoloto',
+    'assess.btn.next':'E e latelang →',
+    'assess.btn.back':'← Morago',
+    'assess.btn.get': 'Bona lenaane la me →',
+    'assess.btn.restart':'Simolola gape',
+
+    'chat.title':     'Mothusi wa FinWell',
+    'chat.subtitle':  'Kaelo e e kgethegileng ya madi',
+    'chat.online':    'O teng',
+    'chat.placeholder':'Kwala molaetsa wa gago...',
+    'chat.privacy':   'Ditokomane di romelwa ka ntlha go AI mme ga di bolokiwe mo seva epe.',
+    'chat.docs.label':'Ditokomane',
+    'chat.docs.none': 'Ga go na ditokomane — kenya kwa tlase kgotsa sela o tshele',
+    'chat.docs.add':  '+ Tsenya tokomane',
+    'chat.drop':      'Latlha ditokomane tsa gago fa',
+
+    'seg.label':      'Bao re ba direlelang',
+    'seg.h2':         'E agiwang bakeng sa mekgwa yotlhe ya boitekanelo jwa madi',
+
+    'cta.label':      'Simolola gompieno',
+    'cta.h2':         'Boitekanelo jwa madi jo bo dirang go botlhe',
+    'cta.sub':        'O tlhoka lenaane la madi la motho ka esi? Simolola gompieno.',
+    'cta.btn':        'Leka FinWell mahala',
+
+    'footer.product': 'Setlhagiswa',
+    'footer.contact': 'Ikopanye',
+  }
+};
+
+let currentLang = localStorage.getItem('fw_lang') || 'en';
+
+// ── APPLY TRANSLATIONS ──
+function applyTranslations(lang) {
+  const t = i18n[lang] || i18n['en'];
+
+  // All data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+
+  // Hero h1 (innerHTML with em tag)
+  const h1 = document.querySelector('.hero h1');
+  if (h1 && t['hero.h1']) h1.innerHTML = t['hero.h1'];
+
+  // Hero sub
+  const heroSub = document.querySelector('.hero-sub');
+  if (heroSub && t['hero.sub']) heroSub.textContent = t['hero.sub'];
+
+  // Assessment left section
+  const assessTag = document.querySelector('.assessment-left .tag');
+  if (assessTag && t['assess.tag']) assessTag.textContent = t['assess.tag'];
+
+  const assessH2 = document.querySelector('.assessment-left h2');
+  if (assessH2 && t['assess.h2']) {
+    assessH2.innerHTML = t['assess.h2'] + '<br><span style="color:var(--lime)">' + t['assess.h2.lime'] + '</span>';
+  }
+
+  const assessP = document.querySelector('.assessment-left p');
+  if (assessP && t['assess.sub']) assessP.textContent = t['assess.sub'];
+
+  // Assessment card
+  const cardH = document.querySelector('.assessment-card-header h3');
+  if (cardH && t['assess.card.h']) cardH.textContent = t['assess.card.h'];
+
+  const cardSub = document.querySelector('.assessment-card-header span');
+  if (cardSub && t['assess.card.sub']) cardSub.textContent = t['assess.card.sub'];
+
+  // Step titles and subs
+  const steps = [
+    { prefix: 'assess.s1', stepId: 'as1' },
+    { prefix: 'assess.s2', stepId: 'as2' },
+    { prefix: 'assess.s3', stepId: 'as3' },
+  ];
+
+  steps.forEach(({ prefix, stepId }) => {
+    const step = document.getElementById(stepId);
+    if (!step) return;
+    const title = step.querySelector('.assess-step-title');
+    const sub   = step.querySelector('.assess-step-sub');
+    const hint  = step.querySelector('.assess-hint');
+    if (title && t[prefix + '.title']) title.textContent = t[prefix + '.title'];
+    if (sub   && t[prefix + '.sub'])   sub.textContent   = t[prefix + '.sub'];
+    if (hint  && t[prefix + '.hint'])  hint.textContent  = t[prefix + '.hint'];
+  });
+
+  // Assessment buttons
+  document.querySelectorAll('.assess-btn:not(.back)').forEach((btn, i) => {
+    if (i === 0 && t['assess.btn.next']) btn.textContent = t['assess.btn.next'];
+    if (i === 1 && t['assess.btn.next']) btn.textContent = t['assess.btn.next'];
+  });
+  document.querySelectorAll('.assess-btn.back').forEach(btn => {
+    if (t['assess.btn.back']) btn.textContent = t['assess.btn.back'];
+  });
+
+  // "Get my action plan" button (step 3 primary)
+  const step3 = document.getElementById('as3');
+  if (step3) {
+    const primaryBtn = step3.querySelector('.assess-btn:not(.back)');
+    if (primaryBtn && t['assess.btn.get']) primaryBtn.textContent = t['assess.btn.get'];
+  }
+
+  // Restart button (step 4)
+  const step4 = document.getElementById('as4');
+  if (step4) {
+    const restartBtn = step4.querySelector('.assess-btn');
+    if (restartBtn && t['assess.btn.restart']) restartBtn.textContent = t['assess.btn.restart'];
+  }
+
+  // Chat header
+  const chatTitle = document.querySelector('.chat-hdr-text h3');
+  if (chatTitle && t['chat.title']) chatTitle.textContent = t['chat.title'];
+
+  const chatSub = document.querySelector('.chat-hdr-text p');
+  if (chatSub && t['chat.subtitle']) chatSub.textContent = t['chat.subtitle'];
+
+  const chatStatus = document.querySelector('.chat-hdr-status');
+  if (chatStatus && t['chat.online']) {
+    chatStatus.innerHTML = '<div class="chat-hdr-dot"></div>' + t['chat.online'];
+  }
+
+  // Chat input placeholder
+  const userInput = document.getElementById('user-input');
+  if (userInput && t['chat.placeholder']) userInput.placeholder = t['chat.placeholder'];
+
+  // Privacy bar
+  const privacyBar = document.getElementById('privacy-bar');
+  if (privacyBar && t['chat.privacy']) privacyBar.textContent = t['chat.privacy'];
+
+  // Docs bar
+  const docsBarLabel = document.getElementById('docs-bar-label');
+  if (docsBarLabel && t['chat.docs.label']) docsBarLabel.textContent = t['chat.docs.label'];
+
+  // Drop overlay
+  const dropOverlayEl = document.getElementById('drop-overlay');
+  if (dropOverlayEl && t['chat.drop']) dropOverlayEl.textContent = t['chat.drop'];
+
+  // Who we serve
+  const segLabel = document.querySelector('.segments .section-label');
+  if (segLabel && t['seg.label']) segLabel.textContent = t['seg.label'];
+
+  const segH2 = document.querySelector('.segments h2');
+  if (segH2 && t['seg.h2']) segH2.textContent = t['seg.h2'];
+
+  // CTA section
+  const ctaLabel = document.querySelector('.cta-section .section-label');
+  if (ctaLabel && t['cta.label']) ctaLabel.textContent = t['cta.label'];
+
+  const ctaH2 = document.querySelector('.cta-section h2');
+  if (ctaH2 && t['cta.h2']) ctaH2.textContent = t['cta.h2'];
+
+  const ctaP = document.querySelector('.cta-section p');
+  if (ctaP && t['cta.sub']) ctaP.textContent = t['cta.sub'];
+
+  // Footer headings
+  const footerCols = document.querySelectorAll('.footer-col h4');
+  if (footerCols[0] && t['footer.product']) footerCols[0].textContent = t['footer.product'];
+  if (footerCols[1] && t['footer.contact']) footerCols[1].textContent = t['footer.contact'];
+
+  // Update lang label in button
+  const langNames = {
+    en: 'English', zu: 'isiZulu', xh: 'isiXhosa',
+    af: 'Afrikaans', st: 'Sesotho', tn: 'Setswana'
+  };
+  const langLabel = document.getElementById('langLabel');
+  if (langLabel) langLabel.textContent = langNames[lang] || 'English';
+
+  // Update active state in dropdown
+  document.querySelectorAll('.lang-option').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+
+  // Store preference
+  localStorage.setItem('fw_lang', lang);
+  currentLang = lang;
+}
+
+// ── TOGGLE DROPDOWN ──
+function toggleLangDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('langToggle').classList.toggle('open');
+}
+
+// ── SET LANGUAGE ──
+function setLanguage(lang) {
+  applyTranslations(lang);
+  document.getElementById('langToggle').classList.remove('open');
+}
+
+// ── CLOSE ON OUTSIDE CLICK ──
+document.addEventListener('click', (e) => {
+  const toggle = document.getElementById('langToggle');
+  if (toggle && !toggle.contains(e.target)) {
+    toggle.classList.remove('open');
+  }
+});
+
+// ── INIT ON LOAD ──
+document.addEventListener('DOMContentLoaded', () => {
+  applyTranslations(currentLang);
+});
+
+</script>
 // Initialise budget tool
 btRecalc();
 
