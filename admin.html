@@ -20,7 +20,6 @@
       --muted2:    #8890aa;
       --lime:      #b8d900;
       --lime-dark: #2c3e10;
-      --accent:    #4f6ef7;
       --danger:    #ef4444;
       --success:   #22c55e;
       --warning:   #eab308;
@@ -92,11 +91,27 @@
     .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
     .filter-btn { padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted2); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; }
     .filter-btn:hover, .filter-btn.active { background: var(--lime); border-color: var(--lime); color: var(--lime-dark); }
-    .search-box { margin-left: auto; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; width: 220px; outline: none; }
+
+    .filter-select {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.15s;
+    }
+    .filter-select:focus { border-color: var(--lime); color: var(--text); }
+    .filter-select option { background: var(--surface2); }
+
+    .search-box { margin-left: auto; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; width: 200px; outline: none; }
     .search-box:focus { border-color: var(--lime); }
     .search-box::placeholder { color: var(--muted); }
 
-    /* ── LEADS TABLE ── */
+    /* ── TABLE ── */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     thead tr { border-bottom: 1px solid var(--border); }
@@ -112,6 +127,25 @@
     .risk-high     { background: rgba(249,115,22,0.15); color: var(--high); }
     .risk-urgent   { background: rgba(239,68,68,0.15);  color: var(--danger); }
     .risk-unknown  { background: rgba(107,114,128,0.15); color: var(--muted2); }
+
+    /* ── CLIENT TAG ── */
+    .client-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .client-tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
 
     .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
     .empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.3; }
@@ -131,6 +165,7 @@
     .client-card-footer { display: flex; gap: 8px; flex-wrap: wrap; }
     .chip { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: var(--surface2); color: var(--muted2); border: 1px solid var(--border); }
     .chip.has-email { background: rgba(34,197,94,0.1); color: var(--success); border-color: rgba(34,197,94,0.2); }
+    .chip.leads-count { font-weight: 600; }
 
     /* ── EDITOR ── */
     .editor-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; margin-top: 24px; }
@@ -164,7 +199,7 @@
     .preview-panel { position: sticky; top: 92px; height: fit-content; }
     .preview-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
     .widget-preview-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
-    .widget-mock { border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+    .widget-mock { border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
     .wm-header { padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
     .wm-logo { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; }
     .wm-title { font-size: 12px; font-weight: 700; }
@@ -197,7 +232,8 @@
     .panel-close { float: right; background: none; border: none; color: var(--muted2); font-size: 20px; cursor: pointer; }
     .panel-close:hover { color: var(--text); }
     .panel-name { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin: 24px 0 4px; }
-    .panel-meta { font-size: 13px; color: var(--muted2); margin-bottom: 20px; }
+    .panel-meta { font-size: 13px; color: var(--muted2); margin-bottom: 16px; }
+    .panel-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .panel-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
     .panel-row-label { color: var(--muted2); }
     .panel-row-value { color: var(--text); font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
@@ -290,11 +326,14 @@
       </div>
 
       <div class="filter-row">
-        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-        <button class="filter-btn" onclick="setFilter('stable',this)">Stable</button>
-        <button class="filter-btn" onclick="setFilter('moderate',this)">Under Pressure</button>
-        <button class="filter-btn" onclick="setFilter('high',this)">High Risk</button>
-        <button class="filter-btn" onclick="setFilter('urgent',this)">Urgent</button>
+        <button class="filter-btn active" onclick="setRiskFilter('all',this)">All Risk</button>
+        <button class="filter-btn" onclick="setRiskFilter('stable',this)">Stable</button>
+        <button class="filter-btn" onclick="setRiskFilter('moderate',this)">Under Pressure</button>
+        <button class="filter-btn" onclick="setRiskFilter('high',this)">High Risk</button>
+        <button class="filter-btn" onclick="setRiskFilter('urgent',this)">Urgent</button>
+        <select class="filter-select" id="client-filter" onchange="renderLeads()">
+          <option value="all">All Clients</option>
+        </select>
         <input class="search-box" type="text" id="search-input" placeholder="Search name, email, phone…" oninput="renderLeads()" />
       </div>
 
@@ -305,7 +344,7 @@
         </div>
         <table id="leads-table" style="display:none">
           <thead><tr>
-            <th>Name</th><th>Phone</th><th>Email</th><th>Risk Level</th><th>Client</th><th>Agent</th><th>Date</th>
+            <th>Name</th><th>Phone</th><th>Email</th><th>Risk Level</th><th>Client</th><th>Date</th>
           </tr></thead>
           <tbody id="leads-body"></tbody>
         </table>
@@ -440,7 +479,10 @@
   let editingId     = null;
   let allConfigs    = {};
   let allLeads      = [];
-  let activeFilter  = 'all';
+  let activeRisk    = 'all';
+
+  // ── COLOUR PALETTE for unknown clients ──
+  const AUTO_COLORS = ['#6366f1','#ec4899','#14b8a6','#f59e0b','#8b5cf6','#06b6d4','#84cc16','#f97316'];
 
   // ── LOGIN ──
   document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
@@ -449,7 +491,7 @@
     const pw = document.getElementById('login-pw').value.trim();
     if (!pw) return;
     try {
-      const res  = await fetch(BACKEND + '/api/auth', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({password: pw}) });
+      const res  = await fetch(BACKEND + '/api/auth', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pw}) });
       const data = await res.json();
       if (data.success) {
         savedPassword = pw;
@@ -457,9 +499,7 @@
         document.getElementById('app').style.display = 'block';
         await Promise.all([loadConfigs(), loadLeads()]);
         updatePreview();
-      } else {
-        document.getElementById('login-error').textContent = 'Incorrect password.';
-      }
+      } else { document.getElementById('login-error').textContent = 'Incorrect password.'; }
     } catch(e) { document.getElementById('login-error').textContent = 'Could not connect. Try again.'; }
   }
 
@@ -487,8 +527,8 @@
       if (!data.error) {
         allLeads = data.leads || [];
         updateLeadStats();
+        buildClientFilter();
         renderLeads();
-        // Show badge if there are urgent leads
         const urgent = allLeads.filter(l => l.risk_level === 'urgent').length;
         const badge  = document.getElementById('leads-badge');
         if (urgent > 0) { badge.textContent = urgent; badge.style.display = 'inline'; }
@@ -498,11 +538,28 @@
 
   async function refreshLeads() {
     document.getElementById('leads-loading').style.display = 'block';
-    document.getElementById('leads-table').style.display  = 'none';
+    document.getElementById('leads-table').style.display   = 'none';
+    document.getElementById('leads-empty').style.display   = 'none';
     await loadLeads();
     document.getElementById('leads-loading').style.display = 'none';
-    document.getElementById('leads-table').style.display  = 'table';
     showToast('Leads refreshed', true);
+  }
+
+  // ── BUILD CLIENT FILTER DROPDOWN ──
+  function buildClientFilter() {
+    const sel = document.getElementById('client-filter');
+    // Get unique client IDs from leads
+    const clientIds = [...new Set(allLeads.map(l => l.client_id).filter(Boolean))].sort();
+    // Rebuild options
+    sel.innerHTML = '<option value="all">All Clients</option>';
+    clientIds.forEach(id => {
+      const cfg  = allConfigs[id];
+      const name = cfg ? cfg.clientName : id;
+      const opt  = document.createElement('option');
+      opt.value  = id;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    });
   }
 
   // ── VIEWS ──
@@ -515,19 +572,18 @@
     if (view === 'leads') {
       document.getElementById('view-leads').classList.add('active');
       document.getElementById('nav-leads').classList.add('active');
-      document.getElementById('topbar-title').textContent = 'Leads';
-      document.getElementById('topbar-action').style.display  = 'none';
+      document.getElementById('topbar-title').textContent    = 'Leads';
+      document.getElementById('topbar-action').style.display = 'none';
       document.getElementById('topbar-refresh').style.display = 'flex';
-      document.getElementById('leads-loading').style.display  = 'none';
-      document.getElementById('leads-table').style.display    = allLeads.length ? 'table' : 'none';
+      document.getElementById('leads-loading').style.display = 'none';
+      document.getElementById('leads-table').style.display   = allLeads.length ? 'table' : 'none';
     } else if (view === 'clients') {
       document.getElementById('view-clients').classList.add('active');
       document.getElementById('nav-clients').classList.add('active');
       document.getElementById('topbar-title').textContent = 'Clients';
       renderClients();
     } else if (view === 'new') {
-      editingId = null;
-      clearForm();
+      editingId = null; clearForm();
       document.getElementById('btn-delete').style.display  = 'none';
       document.getElementById('f-id').disabled             = false;
       document.getElementById('editor-title').textContent  = 'New Client';
@@ -545,7 +601,7 @@
     }
   }
 
-  // ── LEADS ──
+  // ── LEAD STATS ──
   function updateLeadStats() {
     document.getElementById('stat-total').textContent  = allLeads.length;
     document.getElementById('stat-stable').textContent = allLeads.filter(l => l.risk_level === 'stable').length;
@@ -553,19 +609,48 @@
     document.getElementById('stat-urgent').textContent = allLeads.filter(l => l.risk_level === 'urgent').length;
   }
 
-  function setFilter(f, btn) {
-    activeFilter = f;
+  // ── GET CLIENT COLOUR ──
+  function getClientColor(clientId) {
+    const cfg = allConfigs[clientId];
+    if (cfg && cfg.themeColor) return cfg.themeColor;
+    // Auto-assign a colour based on the client ID string
+    let hash = 0;
+    for (let i = 0; i < (clientId || '').length; i++) hash = clientId.charCodeAt(i) + ((hash << 5) - hash);
+    return AUTO_COLORS[Math.abs(hash) % AUTO_COLORS.length];
+  }
+
+  function getClientName(clientId) {
+    const cfg = allConfigs[clientId];
+    return cfg ? (cfg.clientName || clientId) : (clientId || 'Unknown');
+  }
+
+  function clientTag(clientId) {
+    const color = getClientColor(clientId);
+    const name  = getClientName(clientId);
+    const dark  = getDarkColor(color);
+    return `<span class="client-tag" style="background:${color}20;border:1px solid ${color}40;">
+      <span class="client-tag-dot" style="background:${color}"></span>
+      <span style="color:${color}">${esc(name)}</span>
+    </span>`;
+  }
+
+  // ── FILTERS ──
+  function setRiskFilter(f, btn) {
+    activeRisk = f;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderLeads();
   }
 
   function renderLeads() {
-    const search = (document.getElementById('search-input')?.value || '').toLowerCase();
-    const rows   = allLeads.filter(l => {
-      if (activeFilter !== 'all' && l.risk_level !== activeFilter) return false;
+    const search       = (document.getElementById('search-input')?.value || '').toLowerCase();
+    const clientFilter = document.getElementById('client-filter')?.value || 'all';
+
+    const rows = allLeads.filter(l => {
+      if (activeRisk !== 'all' && l.risk_level !== activeRisk) return false;
+      if (clientFilter !== 'all' && l.client_id !== clientFilter) return false;
       if (search) {
-        const hay = [l.name, l.email, l.phone, l.client_id].join(' ').toLowerCase();
+        const hay = [l.name, l.email, l.phone, l.client_id, getClientName(l.client_id)].join(' ').toLowerCase();
         if (!hay.includes(search)) return false;
       }
       return true;
@@ -591,8 +676,7 @@
         <td class="muted">${esc(l.phone) || '—'}</td>
         <td class="muted">${esc(l.email) || '—'}</td>
         <td>${riskBadge(l.risk_level)}</td>
-        <td class="muted">${esc(l.client_id) || '—'}</td>
-        <td class="muted">${esc(l.agent_type) || '—'}</td>
+        <td>${clientTag(l.client_id)}</td>
         <td class="muted">${formatDate(l.created_at)}</td>
       </tr>`).join('');
   }
@@ -603,11 +687,13 @@
     document.getElementById('panel-content').innerHTML = `
       <div class="panel-name">${esc(l.name) || 'Unknown'}</div>
       <div class="panel-meta">${formatDate(l.created_at)}</div>
-      ${riskBadge(l.risk_level)}
-      <div style="margin-top:20px">
+      <div class="panel-badges">
+        ${riskBadge(l.risk_level)}
+        ${clientTag(l.client_id)}
+      </div>
+      <div>
         <div class="panel-row"><span class="panel-row-label">Phone</span><span class="panel-row-value">${esc(l.phone)||'—'}</span></div>
         <div class="panel-row"><span class="panel-row-label">Email</span><span class="panel-row-value">${esc(l.email)||'—'}</span></div>
-        <div class="panel-row"><span class="panel-row-label">Client Site</span><span class="panel-row-value">${esc(l.client_id)||'—'}</span></div>
         <div class="panel-row"><span class="panel-row-label">Agent Type</span><span class="panel-row-value">${esc(l.agent_type)||'—'}</span></div>
         <div class="panel-row"><span class="panel-row-label">Consent</span><span class="panel-row-value">${l.consent_given?'Yes':'No'}</span></div>
         <div class="panel-row"><span class="panel-row-label">Page URL</span><span class="panel-row-value" style="font-size:12px">${esc(l.page_url)||'—'}</span></div>
@@ -642,7 +728,9 @@
       wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg><h3>No clients yet</h3><p>Click New Client to add your first widget client.</p></div>`;
       return;
     }
-    wrap.innerHTML = `<div class="client-grid">${clients.map(([id,c]) => `
+    wrap.innerHTML = `<div class="client-grid">${clients.map(([id,c]) => {
+      const leadCount = allLeads.filter(l => l.client_id === id).length;
+      return `
       <div class="client-card" style="--client-color:${c.themeColor||'#B8D900'}" onclick="editClient('${id}')">
         <div class="client-card-header">
           <div class="client-avatar" style="background:${c.themeColor||'#B8D900'}20;color:${c.themeColor||'#B8D900'}">${c.logoText||'FW'}</div>
@@ -652,8 +740,10 @@
         <div class="client-card-footer">
           <span class="chip" style="background:${c.themeColor||'#B8D900'}18;color:${c.themeColor||'#B8D900'};border-color:${c.themeColor||'#B8D900'}33">${esc(c.buttonLabel||'Chat')}</span>
           ${c.referralEmail ? '<span class="chip has-email">Email set</span>' : ''}
+          ${leadCount > 0 ? `<span class="chip leads-count" style="background:rgba(184,217,0,0.1);color:var(--lime);border-color:rgba(184,217,0,0.3)">${leadCount} lead${leadCount !== 1 ? 's' : ''}</span>` : ''}
         </div>
-      </div>`).join('')}</div>`;
+      </div>`;
+    }).join('')}</div>`;
   }
 
   function typeLabel(t) {
@@ -706,7 +796,7 @@
     const config = { clientName:name, agentType:type, referralEmail:email, brandName:brand, logoText:logo, themeColor:color, buttonLabel:btnLabel, welcomeMessage:welcome, consentText:consent };
 
     try {
-      const res  = await fetch(BACKEND + '/api/client-config', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password:savedPassword, clientId:id, config}) });
+      const res  = await fetch(BACKEND + '/api/client-config', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:savedPassword, clientId:id, config}) });
       const data = await res.json();
       if (data.success) {
         allConfigs[id] = config;
@@ -714,6 +804,7 @@
         document.getElementById('editor-title').textContent = name;
         document.getElementById('btn-delete').style.display = 'block';
         document.getElementById('f-id').disabled = true;
+        buildClientFilter();
         showToast('Client saved and published live!', true);
       } else { showToast('Save failed: ' + (data.error||'unknown'), false); }
     } catch(e) { showToast('Could not reach backend', false); }
