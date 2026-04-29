@@ -2507,6 +2507,46 @@ async function checkPassword() {
           }, 500);
         } catch(e) {}
       }
+      // ── WIDGET HANDOFF — read URL params from thank you email link ──
+// Add this block AFTER the assessData block inside checkPassword()
+// Find this line:   } catch(e) {}
+//                 }   <-- closing the if (assessData) block
+// Add the code below IMMEDIATELY AFTER that closing }
+
+      // Check if coming from widget thank you email link
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlName   = urlParams.get('name');
+      const urlEmail  = urlParams.get('email');
+      const urlRisk   = urlParams.get('risk');
+
+      if (urlName) {
+        const riskLabels = {
+          'stable':   'Stable',
+          'moderate': 'Under Pressure',
+          'high':     'High Risk',
+          'urgent':   'Urgent Support Needed'
+        };
+        const riskLabel = riskLabels[urlRisk] || '';
+        const riskLine  = riskLabel
+          ? `Based on my initial assessment, I am classified as ${riskLabel}.`
+          : '';
+
+        const handoffMsg = [
+          `Hi, my name is ${urlName}.`,
+          `I completed a FinWell financial wellness check and clicked through from my summary email.`,
+          riskLine,
+          `Please skip the intro questions and help me upload my payslip and bank statements for a full personalised analysis.`
+        ].filter(Boolean).join(' ');
+
+        // Clean the URL so it doesn't re-trigger on refresh
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        setTimeout(() => {
+          inputEl.value = handoffMsg;
+          inputEl.dispatchEvent(new Event('input'));
+          send();
+        }, 600);
+      }
     } else {
       errEl.style.display = 'block';
     }
