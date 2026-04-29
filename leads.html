@@ -193,10 +193,10 @@
       color: var(--text);
     }
 
-    .stat-value.stable  { color: var(--stable); }
+    .stat-value.stable   { color: var(--stable); }
     .stat-value.pressure { color: var(--pressure); }
-    .stat-value.high    { color: var(--high); }
-    .stat-value.urgent  { color: var(--urgent); }
+    .stat-value.high     { color: var(--high); }
+    .stat-value.urgent   { color: var(--urgent); }
 
     /* ── FILTERS ── */
     .filters {
@@ -389,7 +389,6 @@
       margin-bottom: 10px;
     }
 
-    /* ── LOADING ── */
     .spinner {
       text-align: center;
       padding: 60px;
@@ -451,10 +450,12 @@
   </div>
 
   <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
     <button class="filter-btn" onclick="setFilter('stable', this)">Stable</button>
-<button class="filter-btn" onclick="setFilter('moderate', this)">Under Pressure</button>
-<button class="filter-btn" onclick="setFilter('high', this)">High Risk</button>
-<button class="filter-btn" onclick="setFilter('urgent', this)">Urgent</button>
+    <button class="filter-btn" onclick="setFilter('moderate', this)">Under Pressure</button>
+    <button class="filter-btn" onclick="setFilter('high', this)">High Risk</button>
+    <button class="filter-btn" onclick="setFilter('urgent', this)">Urgent</button>
+    <input class="search-box" type="text" id="search-input" placeholder="Search name, email, phone…" oninput="renderTable()" />
   </div>
 
   <div class="table-wrap">
@@ -499,7 +500,6 @@
   async function doLogin() {
     const pw = document.getElementById('pw-input').value.trim();
     if (!pw) return;
-
     try {
       const res = await fetch(BACKEND + '/api/auth', {
         method: 'POST',
@@ -507,7 +507,6 @@
         body: JSON.stringify({ password: pw })
       });
       const data = await res.json();
-
       if (data.success) {
         savedPassword = pw;
         document.getElementById('login-screen').style.display = 'none';
@@ -535,12 +534,10 @@
     try {
       const res = await fetch(`${BACKEND}/api/leads?password=${encodeURIComponent(savedPassword)}`);
       const data = await res.json();
-
       if (data.error) {
         document.getElementById('loading').textContent = 'Error: ' + data.error;
         return;
       }
-
       allLeads = data.leads || [];
       document.getElementById('loading').style.display = 'none';
       document.getElementById('leads-table').style.display = 'table';
@@ -553,9 +550,10 @@
 
   // ── STATS ──
   function updateStats() {
+    document.getElementById('stat-total').textContent   = allLeads.length;
     document.getElementById('stat-stable').textContent  = allLeads.filter(l => l.risk_level === 'stable').length;
-document.getElementById('stat-high').textContent    = allLeads.filter(l => l.risk_level === 'high').length;
-document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.risk_level === 'urgent').length;
+    document.getElementById('stat-high').textContent    = allLeads.filter(l => l.risk_level === 'high').length;
+    document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.risk_level === 'urgent').length;
     document.getElementById('lead-count').textContent   = allLeads.length + ' leads';
   }
 
@@ -570,7 +568,6 @@ document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.ris
   // ── RENDER TABLE ──
   function renderTable() {
     const search = document.getElementById('search-input').value.toLowerCase();
-
     let rows = allLeads.filter(l => {
       if (activeFilter !== 'all' && l.risk_level !== activeFilter) return false;
       if (search) {
@@ -590,7 +587,7 @@ document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.ris
     }
 
     empty.style.display = 'none';
-    tbody.innerHTML = rows.map((l, i) => `
+    tbody.innerHTML = rows.map(l => `
       <tr onclick="openPanel(${allLeads.indexOf(l)})">
         <td><strong>${esc(l.name) || '—'}</strong></td>
         <td class="muted">${esc(l.phone) || '—'}</td>
@@ -607,7 +604,6 @@ document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.ris
   function openPanel(idx) {
     const l = allLeads[idx];
     if (!l) return;
-
     document.getElementById('panel-content').innerHTML = `
       <div class="panel-name">${esc(l.name) || 'Unknown'}</div>
       <div class="panel-meta">${formatDate(l.created_at)}</div>
@@ -626,7 +622,6 @@ document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.ris
         ${esc(l.summary)}
       </div>` : ''}
     `;
-
     document.getElementById('panel-overlay').classList.add('open');
   }
 
@@ -638,15 +633,15 @@ document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.ris
 
   // ── HELPERS ──
   function riskBadge(risk) {
-  const map = {
-    'stable':   { cls: 'stable',   label: 'Stable' },
-    'moderate': { cls: 'pressure', label: 'Under Pressure' },
-    'high':     { cls: 'high',     label: 'High Risk' },
-    'urgent':   { cls: 'urgent',   label: 'Urgent' }
-  };
-  const r = map[risk] || { cls: 'unknown', label: risk || 'Unknown' };
-  return `<span class="risk-badge risk-${r.cls}">${r.label}</span>`;
-}
+    const map = {
+      'stable':   { cls: 'stable',   label: 'Stable' },
+      'moderate': { cls: 'pressure', label: 'Under Pressure' },
+      'high':     { cls: 'high',     label: 'High Risk' },
+      'urgent':   { cls: 'urgent',   label: 'Urgent' }
+    };
+    const r = map[risk] || { cls: 'unknown', label: risk || 'Unknown' };
+    return `<span class="risk-badge risk-${r.cls}">${r.label}</span>`;
+  }
 
   function formatDate(iso) {
     if (!iso) return '—';
