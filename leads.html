@@ -451,12 +451,10 @@
   </div>
 
   <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-    <button class="filter-btn" onclick="setFilter('Stable', this)">Stable</button>
-    <button class="filter-btn" onclick="setFilter('Under Pressure', this)">Under Pressure</button>
-    <button class="filter-btn" onclick="setFilter('High Risk', this)">High Risk</button>
-    <button class="filter-btn" onclick="setFilter('Urgent Support Needed', this)">Urgent</button>
-    <input class="search-box" type="text" id="search-input" placeholder="Search name, email, phone…" oninput="renderTable()" />
+    <button class="filter-btn" onclick="setFilter('stable', this)">Stable</button>
+<button class="filter-btn" onclick="setFilter('moderate', this)">Under Pressure</button>
+<button class="filter-btn" onclick="setFilter('high', this)">High Risk</button>
+<button class="filter-btn" onclick="setFilter('urgent', this)">Urgent</button>
   </div>
 
   <div class="table-wrap">
@@ -555,10 +553,9 @@
 
   // ── STATS ──
   function updateStats() {
-    document.getElementById('stat-total').textContent = allLeads.length;
-    document.getElementById('stat-stable').textContent  = allLeads.filter(l => l.risk_level === 'Stable').length;
-    document.getElementById('stat-high').textContent    = allLeads.filter(l => l.risk_level === 'High Risk').length;
-    document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.risk_level === 'Urgent Support Needed').length;
+    document.getElementById('stat-stable').textContent  = allLeads.filter(l => l.risk_level === 'stable').length;
+document.getElementById('stat-high').textContent    = allLeads.filter(l => l.risk_level === 'high').length;
+document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.risk_level === 'urgent').length;
     document.getElementById('lead-count').textContent   = allLeads.length + ' leads';
   }
 
@@ -641,15 +638,15 @@
 
   // ── HELPERS ──
   function riskBadge(risk) {
-    const map = {
-      'Stable': 'stable',
-      'Under Pressure': 'pressure',
-      'High Risk': 'high',
-      'Urgent Support Needed': 'urgent'
-    };
-    const cls = map[risk] || 'unknown';
-    return `<span class="risk-badge risk-${cls}">${esc(risk) || 'Unknown'}</span>`;
-  }
+  const map = {
+    'stable':   { cls: 'stable',   label: 'Stable' },
+    'moderate': { cls: 'pressure', label: 'Under Pressure' },
+    'high':     { cls: 'high',     label: 'High Risk' },
+    'urgent':   { cls: 'urgent',   label: 'Urgent' }
+  };
+  const r = map[risk] || { cls: 'unknown', label: risk || 'Unknown' };
+  return `<span class="risk-badge risk-${r.cls}">${r.label}</span>`;
+}
 
   function formatDate(iso) {
     if (!iso) return '—';
