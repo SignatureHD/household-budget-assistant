@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinWell — Leads Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0f1117;
+      --surface:    #1a1d27;
+      --surface2:   #222636;
+      --border:     #2e3347;
+      --text:       #e8eaf0;
+      --muted:      #6b7280;
+      --accent:     #4f8ef7;
+      --stable:     #22c55e;
+      --pressure:   #eab308;
+      --high:       #f97316;
+      --urgent:     #ef4444;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-logo {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .login-title {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 32px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      text-align: center;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .login-card input:focus { border-color: var(--accent); }
+
+    .login-card button {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .login-card button:hover { opacity: 0.88; }
+
+    .login-error {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--urgent);
+      min-height: 18px;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-brand .dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .header-brand span {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #lead-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn-logout {
+      font-size: 13px;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-logout:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── STATS ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 24px 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .stat-value.stable  { color: var(--stable); }
+    .stat-value.pressure { color: var(--pressure); }
+    .stat-value.high    { color: var(--high); }
+    .stat-value.urgent  { color: var(--urgent); }
+
+    /* ── FILTERS ── */
+    .filters {
+      padding: 0 32px 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-btn {
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .search-box {
+      margin-left: auto;
+      padding: 7px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      width: 220px;
+      outline: none;
+    }
+
+    .search-box:focus { border-color: var(--accent); }
+    .search-box::placeholder { color: var(--muted); }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      padding: 0 32px 40px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+
+    tbody tr:hover { background: var(--surface2); }
+
+    td {
+      padding: 14px 14px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    td.muted { color: var(--muted); font-size: 13px; }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .risk-stable   { background: rgba(34,197,94,0.15);  color: var(--stable); }
+    .risk-pressure { background: rgba(234,179,8,0.15);  color: var(--pressure); }
+    .risk-high     { background: rgba(249,115,22,0.15); color: var(--high); }
+    .risk-urgent   { background: rgba(239,68,68,0.15);  color: var(--urgent); }
+    .risk-unknown  { background: rgba(107,114,128,0.15); color: var(--muted); }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    /* ── DETAIL PANEL ── */
+    .panel-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    .panel-overlay.open { display: flex; }
+
+    .detail-panel {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      width: 420px;
+      max-width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(40px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    .panel-close {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .panel-close:hover { color: var(--text); }
+
+    .panel-name {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 24px 0 4px;
+    }
+
+    .panel-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .panel-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .panel-row-label { color: var(--muted); }
+    .panel-row-value { color: var(--text); font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
+
+    .panel-summary {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .panel-summary-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* ── LOADING ── */
+    .spinner {
+      text-align: center;
+      padding: 60px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); padding: 16px; }
+      .filters, .table-wrap { padding-left: 16px; padding-right: 16px; }
+      header { padding: 0 16px; }
+      .detail-panel { width: 100vw; }
+      .search-box { width: 100%; margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">SignatureHD · FinWell</div>
+    <div class="login-title">Leads Dashboard</div>
+    <input type="password" id="pw-input" placeholder="Enter password" autocomplete="current-password" />
+    <button onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="header-brand">
+      <div class="dot"></div>
+      <span>FinWell Leads</span>
+    </div>
+    <div class="header-right">
+      <span id="lead-count"></span>
+      <button class="btn-logout" onclick="doLogout()">Sign out</button>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Total Leads</div>
+      <div class="stat-value" id="stat-total">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Stable</div>
+      <div class="stat-value stable" id="stat-stable">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">High Risk</div>
+      <div class="stat-value high" id="stat-high">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Urgent</div>
+      <div class="stat-value urgent" id="stat-urgent">—</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('Stable', this)">Stable</button>
+    <button class="filter-btn" onclick="setFilter('Under Pressure', this)">Under Pressure</button>
+    <button class="filter-btn" onclick="setFilter('High Risk', this)">High Risk</button>
+    <button class="filter-btn" onclick="setFilter('Urgent Support Needed', this)">Urgent</button>
+    <input class="search-box" type="text" id="search-input" placeholder="Search name, email, phone…" oninput="renderTable()" />
+  </div>
+
+  <div class="table-wrap">
+    <div class="spinner" id="loading">Loading leads…</div>
+    <table id="leads-table" style="display:none">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Risk Level</th>
+          <th>Client</th>
+          <th>Agent</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="leads-body"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none">No leads found.</div>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel(event)">
+  <div class="detail-panel" id="detail-panel">
+    <button class="panel-close" onclick="closePanel()">✕</button>
+    <div id="panel-content"></div>
+  </div>
+</div>
+
+<script>
+  const BACKEND = 'https://budget-assistant-backend-production.up.railway.app';
+  let allLeads = [];
+  let activeFilter = 'all';
+  let savedPassword = '';
+
+  // ── LOGIN ──
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  async function doLogin() {
+    const pw = document.getElementById('pw-input').value.trim();
+    if (!pw) return;
+
+    try {
+      const res = await fetch(BACKEND + '/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        savedPassword = pw;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadLeads();
+      } else {
+        document.getElementById('login-error').textContent = 'Incorrect password. Please try again.';
+      }
+    } catch (err) {
+      document.getElementById('login-error').textContent = 'Could not connect. Please try again.';
+    }
+  }
+
+  function doLogout() {
+    savedPassword = '';
+    allLeads = [];
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('login-error').textContent = '';
+  }
+
+  // ── LOAD LEADS ──
+  async function loadLeads() {
+    try {
+      const res = await fetch(`${BACKEND}/api/leads?password=${encodeURIComponent(savedPassword)}`);
+      const data = await res.json();
+
+      if (data.error) {
+        document.getElementById('loading').textContent = 'Error: ' + data.error;
+        return;
+      }
+
+      allLeads = data.leads || [];
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('leads-table').style.display = 'table';
+      updateStats();
+      renderTable();
+    } catch (err) {
+      document.getElementById('loading').textContent = 'Failed to load leads. Please refresh.';
+    }
+  }
+
+  // ── STATS ──
+  function updateStats() {
+    document.getElementById('stat-total').textContent = allLeads.length;
+    document.getElementById('stat-stable').textContent  = allLeads.filter(l => l.risk_level === 'Stable').length;
+    document.getElementById('stat-high').textContent    = allLeads.filter(l => l.risk_level === 'High Risk').length;
+    document.getElementById('stat-urgent').textContent  = allLeads.filter(l => l.risk_level === 'Urgent Support Needed').length;
+    document.getElementById('lead-count').textContent   = allLeads.length + ' leads';
+  }
+
+  // ── FILTER ──
+  function setFilter(f, btn) {
+    activeFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+  }
+
+  // ── RENDER TABLE ──
+  function renderTable() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+
+    let rows = allLeads.filter(l => {
+      if (activeFilter !== 'all' && l.risk_level !== activeFilter) return false;
+      if (search) {
+        const hay = [l.name, l.email, l.phone, l.client_id].join(' ').toLowerCase();
+        if (!hay.includes(search)) return false;
+      }
+      return true;
+    });
+
+    const tbody = document.getElementById('leads-body');
+    const empty = document.getElementById('empty-state');
+
+    if (rows.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+
+    empty.style.display = 'none';
+    tbody.innerHTML = rows.map((l, i) => `
+      <tr onclick="openPanel(${allLeads.indexOf(l)})">
+        <td><strong>${esc(l.name) || '—'}</strong></td>
+        <td class="muted">${esc(l.phone) || '—'}</td>
+        <td class="muted">${esc(l.email) || '—'}</td>
+        <td>${riskBadge(l.risk_level)}</td>
+        <td class="muted">${esc(l.client_id) || '—'}</td>
+        <td class="muted">${esc(l.agent_type) || '—'}</td>
+        <td class="muted">${formatDate(l.created_at)}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ── DETAIL PANEL ──
+  function openPanel(idx) {
+    const l = allLeads[idx];
+    if (!l) return;
+
+    document.getElementById('panel-content').innerHTML = `
+      <div class="panel-name">${esc(l.name) || 'Unknown'}</div>
+      <div class="panel-meta">${formatDate(l.created_at)}</div>
+      ${riskBadge(l.risk_level)}
+      <div style="margin-top: 24px;">
+        <div class="panel-row"><span class="panel-row-label">Phone</span><span class="panel-row-value">${esc(l.phone) || '—'}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Email</span><span class="panel-row-value">${esc(l.email) || '—'}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Client Site</span><span class="panel-row-value">${esc(l.client_id) || '—'}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Agent Type</span><span class="panel-row-value">${esc(l.agent_type) || '—'}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Consent</span><span class="panel-row-value">${l.consent_given ? 'Yes' : 'No'}</span></div>
+        <div class="panel-row"><span class="panel-row-label">Page URL</span><span class="panel-row-value" style="font-size:12px">${esc(l.page_url) || '—'}</span></div>
+      </div>
+      ${l.summary ? `
+      <div class="panel-summary">
+        <div class="panel-summary-title">Conversation Summary</div>
+        ${esc(l.summary)}
+      </div>` : ''}
+    `;
+
+    document.getElementById('panel-overlay').classList.add('open');
+  }
+
+  function closePanel(e) {
+    if (!e || e.target === document.getElementById('panel-overlay') || e.currentTarget?.classList?.contains('panel-close')) {
+      document.getElementById('panel-overlay').classList.remove('open');
+    }
+  }
+
+  // ── HELPERS ──
+  function riskBadge(risk) {
+    const map = {
+      'Stable': 'stable',
+      'Under Pressure': 'pressure',
+      'High Risk': 'high',
+      'Urgent Support Needed': 'urgent'
+    };
+    const cls = map[risk] || 'unknown';
+    return `<span class="risk-badge risk-${cls}">${esc(risk) || 'Unknown'}</span>`;
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
